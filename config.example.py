@@ -8,9 +8,11 @@
 # 混合种植使用字典：{"crop": "mixed", "main": Entities.Bush}
 # 奇异物质使用字典：{"crop": "weird", "strategy": "basic"}（basic/advanced/chain）
 # 恐龙养殖使用字典：{"crop": "dinosaur", "mode": "optimal"}（optimal/full/efficient）
+# 迷宫探索使用字典：{"crop": "maze", "mode": "optimal"}（optimal/smart/基础）
 PRIORITY = [
+	{"crop": "maze", "mode": "optimal"},        # 迷宫探索（消耗奇异物质，获取n²金币）
 	{"crop": "dinosaur", "mode": "optimal"},    # 恐龙养殖（自动最优策略，n²骨头）
-	{"crop": "weird", "strategy": "advanced"},  # 奇异物质（高产策略）
+	{"crop": "weird", "strategy": "advanced"},  # 奇异物质（高产策略，为迷宫提供资源）
 	{"crop": "mixed", "main": Entities.Tree},   # 混合种植-树木（伴生植物5倍产量）
 	{"crop": "grass"},                          # 草地（快速收割）
 	{"crop": "sunflowers"},                     # 向日葵（能量）

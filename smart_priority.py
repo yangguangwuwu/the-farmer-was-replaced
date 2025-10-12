@@ -11,6 +11,7 @@ import crop_cactus
 import crop_mix
 import crop_weird
 import crop_dinosaur
+import crop_maze
 from config import PRIORITY, THRESHOLDS
 
 # ====================================
@@ -29,6 +30,7 @@ def check_resources():
 		"cactus": num_items(Items.Cactus),
 		"weird_substance": num_items(Items.Weird_Substance),
 		"bone": num_items(Items.Bone),
+		"gold": num_items(Items.Gold),
 	}
 
 def can_plant_crop(crop_info, resources):
@@ -94,6 +96,48 @@ def can_plant_crop(crop_info, resources):
 			if "apples" in crop_info:
 				apple_count = crop_info["apples"]
 			if resources["cactus"] >= apple_count:
+				return True
+			return False
+	
+	# 迷宫：需要奇异物质
+	if crop_name == "maze":
+		# 检查是否解锁迷宫
+		maze_upgrades = num_unlocked(Unlocks.Mazes)
+		if maze_upgrades == 0:
+			return False
+		
+		# 计算所需奇异物质
+		field_size = get_world_size()
+		substance_per_maze = field_size * (2 ** (maze_upgrades - 1))
+		
+		# 检查模式
+		maze_mode = "optimal"
+		if "mode" in crop_info:
+			maze_mode = crop_info["mode"]
+		
+		# optimal模式：至少能生成一次
+		if maze_mode == "optimal":
+			if resources["weird_substance"] >= substance_per_maze:
+				return True
+			return False
+		
+		# smart模式：检查指定大小
+		elif maze_mode == "smart":
+			target_size = field_size
+			if "size" in crop_info:
+				target_size = crop_info["size"]
+			required = target_size * (2 ** (maze_upgrades - 1))
+			if resources["weird_substance"] >= required:
+				return True
+			return False
+		
+		# 默认：检查基础资源
+		else:
+			reuse = 0
+			if "reuse" in crop_info:
+				reuse = crop_info["reuse"]
+			required = substance_per_maze * (reuse + 1)
+			if resources["weird_substance"] >= required:
 				return True
 			return False
 	
@@ -175,6 +219,8 @@ def get_crop_benefit(crop_info, resources):
 	
 	# 能量充足且资源充足：种植高价值作物
 	if resources["power"] >= THRESHOLDS["power_safe"]:
+		if crop_name == "maze":
+			return 580  # 迷宫：n²金币（重用可叠加）
 		if crop_name == "dinosaur":
 			return 570  # 恐龙：n²根骨头（远古资源）
 		if crop_name == "weird":
@@ -282,6 +328,27 @@ def plant_crop(crop_info):
 		else:
 			# 最优策略（根据仙人掌自动决定）
 			crop_dinosaur.farm_dinosaur_optimal()
+	elif crop_name == "maze":
+		# 根据模式选择不同的迷宫策略
+		maze_mode = "optimal"  # 默认模式
+		if "mode" in crop_info:
+			maze_mode = crop_info["mode"]
+		
+		if maze_mode == "smart":
+			# 智能模式：指定迷宫大小
+			target_size = None
+			if "size" in crop_info:
+				target_size = crop_info["size"]
+			crop_maze.farm_maze_smart(target_size)
+		elif maze_mode == "optimal":
+			# 最优模式：自动决定重用次数
+			crop_maze.farm_maze_optimal()
+		else:
+			# 基础模式：指定重用次数
+			reuse_count = 0
+			if "reuse" in crop_info:
+				reuse_count = crop_info["reuse"]
+			crop_maze.farm_maze(reuse_count)
 
 # ====================================
 # 🚀 主循环
