@@ -4,24 +4,7 @@
 
 import utils
 
-def farm_dinosaur(target_size=None):
-	"""
-	恐龙养殖主函数
-	
-	参数:
-		target_size: 目标农场大小（None=使用当前大小）
-	
-	收益:
-		n² 根骨头（n=尾巴长度）
-		例如：10x10农场=100格=10000根骨头
-	
-	原理:
-		1. 装备恐龙帽（消耗仙人掌购买苹果）
-		2. 按S形路径遍历农场
-		3. 尾巴跟随无人机轨迹生长
-		4. 填满农场后卸下帽子收获骨头
-	"""
-	
+def farm_dinosaur(target_size=None):	
 	# 如果指定了目标大小，调整农场
 	if target_size != None:
 		current_size = get_world_size()
@@ -80,13 +63,6 @@ def farm_dinosaur(target_size=None):
 	return True
 
 def move_to_safe(target_x, target_y):
-	"""
-	安全移动函数，兼容恐龙尾巴
-	
-	返回:
-		True = 移动成功
-		False = 移动失败（被尾巴阻挡）
-	"""
 	current_x = get_pos_x()
 	current_y = get_pos_y()
 	
@@ -124,22 +100,7 @@ def move_to_safe(target_x, target_y):
 	
 	return True
 
-def farm_dinosaur_efficient(apple_count):
-	"""
-	高效恐龙养殖（指定苹果数量）
-	
-	适用场景：
-		- 不需要最大尾巴
-		- 只需要特定数量的骨头
-		- 想节省时间和资源
-	
-	参数:
-		apple_count: 要吃的苹果数量
-	
-	收益:
-		apple_count² 根骨头
-	"""
-	
+def farm_dinosaur_efficient(apple_count):	
 	# 检查仙人掌
 	cactus_count = num_items(Items.Cactus)
 	if cactus_count < apple_count:
@@ -170,14 +131,6 @@ def farm_dinosaur_efficient(apple_count):
 	return True
 
 def farm_dinosaur_optimal():
-	"""
-	最优恐龙养殖策略
-	
-	自动选择最佳农场大小和策略：
-		- 根据仙人掌数量决定农场大小
-		- 平衡时间成本和收益
-	"""
-	
 	# 检查仙人掌库存
 	cactus_count = num_items(Items.Cactus)
 	
@@ -203,15 +156,6 @@ def farm_dinosaur_optimal():
 	return farm_dinosaur(optimal_size)
 
 def calculate_move_cost(apples_eaten):
-	"""
-	计算吃掉指定数量苹果后，move()的ticks消耗
-	
-	参数:
-		apples_eaten: 已吃苹果数量
-	
-	返回:
-		move()消耗的ticks数量
-	"""
 	ticks = 400
 	i = 0
 	while i < apples_eaten:
