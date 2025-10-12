@@ -4,26 +4,7 @@
 
 import utils
 
-def farm_maze(reuse_count=0):
-	"""
-	迷宫探索主函数
-	
-	参数:
-		reuse_count: 重复使用迷宫次数（0-300）
-	
-	收益:
-		- 初始收获: n² 金币（n=迷宫大小）
-		- 每次重用: 额外 n² 金币
-		- 总收益: (reuse_count + 1) * n² 金币
-	
-	原理:
-		1. 种植灌木
-		2. 使用奇异物质生成迷宫
-		3. 用右手法则找到宝藏
-		4. 可选：重复使用迷宫
-		5. 收获宝藏获得金币
-	"""
-	
+def farm_maze(reuse_count=0):	
 	# 获取农场大小
 	world_size = get_world_size()
 	
@@ -81,19 +62,6 @@ def farm_maze(reuse_count=0):
 	return True
 
 def solve_maze_righthand():
-	"""
-	使用右手法则解决迷宫
-	
-	右手法则：
-		1. 将右手贴着墙
-		2. 一直沿着墙走
-		3. 最终会到达出口（或宝藏）
-	
-	返回:
-		True = 找到宝藏
-		False = 失败
-	"""
-	
 	# 方向数组（顺时针）
 	directions = [North, East, South, West]
 	direction_index = 0  # 初始朝北
@@ -144,18 +112,7 @@ def solve_maze_righthand():
 	# 超过最大步数，失败
 	return False
 
-def solve_maze_lefthand():
-	"""
-	使用左手法则解决迷宫
-	
-	左手法则：
-		与右手法则相反，将左手贴着墙
-	
-	返回:
-		True = 找到宝藏
-		False = 失败
-	"""
-	
+def solve_maze_lefthand():	
 	# 方向数组
 	directions = [North, East, South, West]
 	direction_index = 0  # 初始朝北
@@ -206,18 +163,7 @@ def solve_maze_lefthand():
 	# 超过最大步数
 	return False
 
-def solve_maze_measure():
-	"""
-	使用 measure() 直接导航到宝藏
-	
-	measure() 返回宝藏的绝对位置 (x, y)
-	然后尝试朝宝藏方向移动
-	
-	返回:
-		True = 找到宝藏
-		False = 失败
-	"""
-	
+def solve_maze_measure():	
 	max_steps = 10000
 	steps = 0
 	
@@ -283,15 +229,6 @@ def solve_maze_measure():
 	return False
 
 def farm_maze_optimal():
-	"""
-	最优迷宫策略
-	
-	根据奇异物质数量自动决定：
-		- 是否生成迷宫
-		- 迷宫大小
-		- 是否重用
-	"""
-	
 	# 检查是否解锁迷宫
 	maze_upgrades = num_unlocked(Unlocks.Mazes)
 	if maze_upgrades == 0:
@@ -322,18 +259,6 @@ def farm_maze_optimal():
 		return False
 
 def farm_maze_smart(target_size=None):
-	"""
-	智能迷宫策略
-	
-	参数:
-		target_size: 目标农场大小（None=使用当前大小）
-	
-	特点:
-		- 可以临时调整农场大小以优化资源利用
-		- 使用 measure() 导航法（最快）
-		- 自动计算最佳重用次数
-	"""
-	
 	# 保存原始农场大小
 	original_size = get_world_size()
 	
