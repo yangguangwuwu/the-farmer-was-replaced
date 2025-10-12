@@ -114,6 +114,7 @@ THRESHOLDS = {
 - **填满模式**：S形遍历填满整个当前农场（最大收益）
 - **高效模式**：只吃指定数量苹果（快速获取骨头）
 - 收益：尾巴长度的平方（n²根骨头）
+- ⚠️ **重要**：恐龙模式下世界边界不可穿越（非环形世界）
 
 #### 🌳 **迷宫探索** (`crop_maze.py`)
 三种探索策略：
@@ -185,27 +186,37 @@ plant_best_companion(position_demand)
 
 ### 恐龙养殖优化 - S形遍历
 ```python
+# ⚠️ 重要：恐龙模式下世界边界不可穿越（非环形）
+# 使用直接的 move() 而不是 utils.move_to()
+
 # S形路径遍历农场，确保尾巴填满每个格子
 y = 0
 while y < size:
     if y % 2 == 0:
         # 偶数行：从左到右
-        traverse_row_left_to_right()
+        x = 0
+        while x < size:
+            success = move_to_safe(x, y)  # 直线移动
+            if not success:
+                break  # 被尾巴阻挡
+            x = x + 1
     else:
-        # 奇数行：从右到左
-        traverse_row_right_to_left()
+        # 奇数行：从右到左（S形）
+        x = size - 1
+        while x >= 0:
+            success = move_to_safe(x, y)
+            if not success:
+                break
+            x = x - 1
     y = y + 1
 
-# 检测尾巴填满
-success = move(direction)
-if not success:
-    # 无法移动 = 尾巴已填满农场
-    harvest_bones()
+# move_to_safe() 只使用 move(方向)，不计算环形路径
 ```
 **效果**：
 - 10×10农场 = 100格 = 10,000根骨头
 - 自动根据仙人掌库存选择最优农场大小
 - 每吃一个苹果，移动速度提升3%
+- ⚠️ 边界不可穿越，S形遍历避免长距离移动
 
 ### 迷宫探索优化 - 右手法则
 ```python
