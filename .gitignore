@@ -1,1 +1,24 @@
+# 个人配置文件（包含你的游戏策略和优先级设置）
+config.py
+
+# 游戏存档文件
 save.json
+__builtins__.py
+
+# Python 缓存文件
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE 配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统文件
+.DS_Store
+Thumbs.db

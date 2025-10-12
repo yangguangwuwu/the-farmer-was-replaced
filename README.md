@@ -12,6 +12,8 @@
 Save0/
 ├── main.py                 # 主程序入口
 ├── smart_priority.py       # 智能优先级控制器（推荐使用）
+├── config.py               # 🎮 用户配置文件（优先级和阈值）
+├── config.example.py       # 配置文件示例
 ├── utils.py                # 通用工具函数（移动优化、耕地等）
 ├── crop_grass.py           # 草地收割（获取干草）
 ├── crop_trees.py           # 树木种植（棋盘模式，避免生长惩罚）
@@ -20,7 +22,8 @@ Save0/
 ├── crop_sunflowers.py      # 向日葵种植（级联收获，5倍能量）
 ├── crop_cactus.py          # 仙人掌种植（排序收获，n²产量）
 ├── crop_mix.py             # 混合种植（伴生植物，5倍产量）
-└── crop_weird.py           # 奇异物质收集（感染策略）
+├── crop_weird.py           # 奇异物质收集（感染策略）
+└── .gitignore              # Git 忽略配置
 ```
 
 ## 🚀 核心功能
@@ -167,20 +170,28 @@ plant_best_companion(position_demand)
 
 ### 快速开始
 
-1. **直接使用智能控制器**
-   ```python
-   # 运行 smart_priority.py
-   # 系统会自动根据资源状态选择最佳作物
+1. **配置你的策略**
+   ```bash
+   # 首次使用：复制配置示例文件
+   cp config.example.py config.py
+   
+   # 然后编辑 config.py 设置你的优先级
    ```
 
 2. **自定义优先级**
    ```python
-   # 编辑 PRIORITY 列表
+   # 编辑 config.py 中的 PRIORITY 列表
    PRIORITY = [
        {"crop": "sunflowers"},                     # 优先种向日葵
        {"crop": "mixed", "main": Entities.Bush},   # 混合种植灌木
        {"crop": "pumpkins"},                       # 南瓜
    ]
+   ```
+
+3. **运行智能控制器**
+   ```python
+   # 运行 smart_priority.py
+   # 系统会自动根据资源状态选择最佳作物
    ```
 
 3. **单独运行作物模块**
@@ -190,6 +201,8 @@ plant_best_companion(position_demand)
    ```
 
 ### 高级配置
+
+**在 `config.py` 中配置：**
 
 **奇异物质策略选择：**
 ```python
@@ -203,6 +216,18 @@ plant_best_companion(position_demand)
 {"crop": "mixed", "main": Entities.Bush}    # 灌木（高木材）
 {"crop": "mixed", "main": Entities.Tree}    # 树木（棋盘模式）
 {"crop": "mixed", "main": Entities.Carrot}  # 胡萝卜
+```
+
+**资源阈值调整：**
+```python
+THRESHOLDS = {
+    "power_low": 100,         # 能量低于此值优先种向日葵
+    "power_safe": 200,        # 能量安全值
+    "carrot_min": 2000,       # 胡萝卜最低储备
+    "wood_min": 3000,         # 木材最低储备
+    "hay_min": 1000,          # 干草最低储备
+    "fertilizer_min": 5,      # 肥料最低储备
+}
 ```
 
 ## 🎓 学习要点
