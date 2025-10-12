@@ -7,7 +7,9 @@
 # 可以随意调整顺序，程序会自动检查资源是否足够
 # 混合种植使用字典：{"crop": "mixed", "main": Entities.Bush}
 # 奇异物质使用字典：{"crop": "weird", "strategy": "basic"}（basic/advanced/chain）
+# 恐龙养殖使用字典：{"crop": "dinosaur", "mode": "optimal"}（optimal/full/efficient）
 PRIORITY = [
+	{"crop": "dinosaur", "mode": "optimal"},    # 恐龙养殖（自动最优策略，n²骨头）
 	{"crop": "weird", "strategy": "advanced"},  # 奇异物质（高产策略）
 	{"crop": "mixed", "main": Entities.Tree},   # 混合种植-树木（伴生植物5倍产量）
 	{"crop": "grass"},                          # 草地（快速收割）
@@ -15,7 +17,7 @@ PRIORITY = [
 	{"crop": "pumpkins"},                       # 南瓜（高价值）
 	{"crop": "carrots"},                        # 胡萝卜（基础资源）
 	{"crop": "trees"},                          # 树木（木材）
-	{"crop": "cactus"},                         # 仙人掌（最高产出）
+	{"crop": "cactus"},                         # 仙人掌（最高产出，同时为恐龙提供资源）
 ]
 
 # 资源阈值配置（可自定义调整）

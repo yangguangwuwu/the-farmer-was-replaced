@@ -23,6 +23,7 @@ Save0/
 ├── crop_cactus.py          # 仙人掌种植（排序收获，n²产量）
 ├── crop_mix.py             # 混合种植（伴生植物，5倍产量）
 ├── crop_weird.py           # 奇异物质收集（感染策略）
+├── crop_dinosaur.py        # 🦕 恐龙养殖（n²骨头收益）
 └── .gitignore              # Git 忽略配置
 ```
 
@@ -105,6 +106,13 @@ THRESHOLDS = {
 - **高产策略**：胡萝卜+多次施肥，最大化产量
 - **连锁策略**：利用奇异物质扩散感染，节省肥料
 
+#### 🦕 **恐龙养殖** (`crop_dinosaur.py`)
+三种养殖模式：
+- **最优模式**：根据仙人掌库存自动选择农场大小
+- **填满模式**：S形遍历填满整个当前农场（最大收益）
+- **高效模式**：只吃指定数量苹果（快速获取骨头）
+- 收益：尾巴长度的平方（n²根骨头）
+
 ### 3. **优化工具** (`utils.py`)
 
 #### 🎯 **移动优化**
@@ -165,6 +173,29 @@ plant_best_companion(position_demand)
 ```
 **效果**：5倍产量加成
 
+### 恐龙养殖优化 - S形遍历
+```python
+# S形路径遍历农场，确保尾巴填满每个格子
+y = 0
+while y < size:
+    if y % 2 == 0:
+        # 偶数行：从左到右
+        traverse_row_left_to_right()
+    else:
+        # 奇数行：从右到左
+        traverse_row_right_to_left()
+    y = y + 1
+
+# 检测尾巴填满
+success = move(direction)
+if not success:
+    # 无法移动 = 尾巴已填满农场
+    harvest_bones()
+```
+**效果**：
+- 10×10农场 = 100格 = 10,000根骨头
+- 自动根据仙人掌库存选择最优农场大小
+- 每吃一个苹果，移动速度提升3%
 
 ## 🔧 使用指南
 
@@ -216,6 +247,13 @@ plant_best_companion(position_demand)
 {"crop": "mixed", "main": Entities.Bush}    # 灌木（高木材）
 {"crop": "mixed", "main": Entities.Tree}    # 树木（棋盘模式）
 {"crop": "mixed", "main": Entities.Carrot}  # 胡萝卜
+```
+
+**恐龙养殖模式：**
+```python
+{"crop": "dinosaur", "mode": "optimal"}     # 自动最优（根据仙人掌库存）
+{"crop": "dinosaur", "mode": "full"}        # 填满当前农场（最大收益）
+{"crop": "dinosaur", "mode": "efficient", "apples": 50}  # 指定苹果数
 ```
 
 **资源阈值调整：**

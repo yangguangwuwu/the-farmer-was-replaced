@@ -10,6 +10,7 @@ import crop_sunflowers
 import crop_cactus
 import crop_mix
 import crop_weird
+import crop_dinosaur
 from config import PRIORITY, THRESHOLDS
 
 # ====================================
@@ -27,6 +28,7 @@ def check_resources():
 		"water": num_items(Items.Water),
 		"cactus": num_items(Items.Cactus),
 		"weird_substance": num_items(Items.Weird_Substance),
+		"bone": num_items(Items.Bone),
 	}
 
 def can_plant_crop(crop_info, resources):
@@ -64,6 +66,36 @@ def can_plant_crop(crop_info, resources):
 		if resources["fertilizer"] >= THRESHOLDS["fertilizer_min"]:
 			return True
 		return False
+	
+	# 恐龙：需要仙人掌（购买苹果）
+	if crop_name == "dinosaur":
+		# 根据养殖模式检查资源
+		dino_mode = "optimal"  # 默认模式
+		if "mode" in crop_info:
+			dino_mode = crop_info["mode"]
+		
+		# optimal模式：根据仙人掌数量自动决定
+		if dino_mode == "optimal":
+			if resources["cactus"] >= 400:  # 至少2x2农场
+				return True
+			return False
+		
+		# full模式：需要更多仙人掌填满当前农场
+		elif dino_mode == "full":
+			field_size = get_world_size()
+			required_cactus = field_size * field_size
+			if resources["cactus"] >= required_cactus:
+				return True
+			return False
+		
+		# efficient模式：检查是否有指定数量的仙人掌
+		else:
+			apple_count = 20  # 默认20个苹果
+			if "apples" in crop_info:
+				apple_count = crop_info["apples"]
+			if resources["cactus"] >= apple_count:
+				return True
+			return False
 	
 	# 获取作物对应的Entity类型
 	entity_type = None
@@ -143,6 +175,8 @@ def get_crop_benefit(crop_info, resources):
 	
 	# 能量充足且资源充足：种植高价值作物
 	if resources["power"] >= THRESHOLDS["power_safe"]:
+		if crop_name == "dinosaur":
+			return 570  # 恐龙：n²根骨头（远古资源）
 		if crop_name == "weird":
 			return 560  # 奇异物质：利用肥料获取特殊资源
 		if crop_name == "mixed":
@@ -230,6 +264,24 @@ def plant_crop(crop_info):
 		else:
 			# 默认使用高产策略
 			crop_weird.farm_weird_substance_advanced()
+	elif crop_name == "dinosaur":
+		# 根据模式选择不同的恐龙养殖方法
+		dino_mode = "optimal"  # 默认模式
+		if "mode" in crop_info:
+			dino_mode = crop_info["mode"]
+		
+		if dino_mode == "full":
+			# 填满整个当前农场
+			crop_dinosaur.farm_dinosaur()
+		elif dino_mode == "efficient":
+			# 只吃指定数量的苹果
+			apple_count = 20
+			if "apples" in crop_info:
+				apple_count = crop_info["apples"]
+			crop_dinosaur.farm_dinosaur_efficient(apple_count)
+		else:
+			# 最优策略（根据仙人掌自动决定）
+			crop_dinosaur.farm_dinosaur_optimal()
 
 # ====================================
 # 🚀 主循环
