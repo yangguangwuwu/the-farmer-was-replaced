@@ -34,13 +34,3 @@ def farm_carrots():
 			y = y + 1
 		x = x + 1
 	
-	# 收获
-	x = 0
-	while x < size:
-		y = 0
-		while y < size:
-			utils.move_to(x, y)
-			if can_harvest():
-				harvest()
-			y = y + 1
-		x = x + 1
