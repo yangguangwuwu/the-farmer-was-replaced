@@ -1,15 +1,27 @@
 import utils
 
-# ===== 南瓜种植（巨型南瓜策略） =====
+# ===== 南瓜种植（巨型南瓜策略）优化版 =====
 # 优化：处理场上现有作物，持续补种枯萎南瓜直到全部成熟
 def farm_pumpkins():
 	size = get_world_size()
 	
-	# 第一阶段：清理并种植满场南瓜
+	# 合并阶段：清理并种植满场南瓜，同时进行初始浇水
 	x = 0
+	y = 0
+	direction = 1  # 1 表示向右，-1 表示向左
+	
+	# 蛇形路径移动，提高效率
+	withered_positions = []
 	while x < size:
-		y = 0
-		while y < size:
+		# 根据方向确定y的起始和结束值
+		if direction == 1:
+			y = 0
+			y_end = size
+		else:
+			y = size - 1
+			y_end = -1
+		
+		while y != y_end:
 			utils.move_to(x, y)
 			utils.tilling()
 			
@@ -28,31 +40,19 @@ def farm_pumpkins():
 			if entity != Entities.Pumpkin:
 				plant(Entities.Pumpkin)
 			
-			y = y + 1
-		x = x + 1
-	
-	# 持续等待并补种枯萎的南瓜，直到全部同时成熟
-	# 优化：仅记录和检查枯萎南瓜位置
-	withered_positions = []
-	
-	# 初始扫描：建立枯萎南瓜位置列表
-	x = 0
-	while x < size:
-		y = 0
-		while y < size:
-			utils.move_to(x, y)
-			entity = get_entity_type()
+			# 高水位加速成熟（只在需要时浇水）
+			if get_water() < 0.8:
+				use_item(Items.Water)
 			
-			if entity == Entities.Pumpkin:
-				# 高水位加速成熟
-				if get_water() < 0.8:
-					use_item(Items.Water)
-			else:
-				# 枯萎南瓜：补种并记录位置
-				plant(Entities.Pumpkin)
+			# 检查是否为枯萎南瓜
+			if entity != Entities.Pumpkin:
 				withered_positions.append((x, y))
 			
-			y = y + 1
+			# 根据方向更新y值
+			y = y + direction
+		
+		# 更新方向和x值
+		direction = direction * -1
 		x = x + 1
 	
 	# 循环检查枯萎南瓜位置，直到全部成熟
@@ -69,7 +69,7 @@ def farm_pumpkins():
 				if not can_harvest():
 					# 仍未成熟，继续等待
 					new_withered.append(pos)
-					# 高水位加速成熟
+					# 高水位加速成熟（只在需要时浇水）
 					if get_water() < 0.8:
 						use_item(Items.Water)
 				# else: 已成熟，从列表中移除（不加入new_withered）
@@ -83,4 +83,3 @@ def farm_pumpkins():
 	# 收获巨型南瓜（nxn产出n*n*n，n>=6时产出n*n*6）
 	if can_harvest():
 		harvest()
-
