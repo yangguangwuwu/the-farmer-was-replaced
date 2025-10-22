@@ -140,14 +140,26 @@ def farm_mixed(main_crop=None):
 					# 转回草地
 					if get_ground_type() == Grounds.Soil:
 						till()
+					# 如果这个位置原本是主作物，需要从主作物坐标列表中移除
+					if (cx, cy) in main_crop_positions:
+						main_crop_positions.remove((cx, cy))
 				elif best_type == Entities.Bush:
 					if num_items(Items.Wood) >= 5:
 						plant(Entities.Bush)
+						# 如果这个位置原本是主作物，需要从主作物坐标列表中移除
+						if (cx, cy) in main_crop_positions:
+							main_crop_positions.remove((cx, cy))
 				elif best_type == Entities.Tree:
 					plant(Entities.Tree)
+					# 如果这个位置原本是主作物，需要从主作物坐标列表中移除
+					if (cx, cy) in main_crop_positions:
+						main_crop_positions.remove((cx, cy))
 				elif best_type == Entities.Carrot:
 					if num_items(Items.Carrot) >= 1:
 						plant(Entities.Carrot)
+						# 如果这个位置原本是主作物，需要从主作物坐标列表中移除
+						if (cx, cy) in main_crop_positions:
+							main_crop_positions.remove((cx, cy))
 
 	for main_pos in main_crop_positions:
 		x, y = main_pos
