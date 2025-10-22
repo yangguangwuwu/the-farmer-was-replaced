@@ -32,15 +32,18 @@ def farm_mixed(main_crop=None):
 		y = y_start
 		while y != y_end:
 			utils.move_to(x, y)
-			utils.tilling()
-			
 			entity = get_entity_type()
-			
 			# 先尝试收获成熟作物，避免浪费
 			if entity == Entities.Grass:
 				harvest()
 			elif can_harvest():
 				harvest()
+				
+			utils.tilling()
+			
+			
+			
+
 			
 			entity = get_entity_type()
 			
