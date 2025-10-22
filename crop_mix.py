@@ -1,6 +1,6 @@
 import utils
 
-# ===== 混合种植（伴生植物策略） =====
+# ===== 混合种植（伴生植物策略）优化版 =====
 # 优化：利用伴生植物机制，获得5倍（或更高）产量
 # 支持：Grass、Bush、Tree、Carrot
 # 参数：main_crop - 指定主作物类型（Entities.Bush/Tree/Carrot/Grass，默认Bush）
@@ -14,11 +14,23 @@ def farm_mixed(main_crop=None):
 	# 存储伴生需求 {(x,y): (companion_type, (cx, cy))}
 	companion_map = {}
 	
-	# 第一阶段：种植主作物并记录伴生需求
+	# 使用蛇形路径移动，提高效率
 	x = 0
+	y = 0
+	direction = 1  # 1 表示向右，-1 表示向左
+	
+	# 合并阶段：种植主作物并记录伴生需求
 	while x < size:
-		y = 0
-		while y < size:
+		# 根据方向确定y的起始和结束值
+		if direction == 1:
+			y_start = 0
+			y_end = size
+		else:
+			y_start = size - 1
+			y_end = -1
+		
+		y = y_start
+		while y != y_end:
 			utils.move_to(x, y)
 			utils.tilling()
 			
@@ -67,7 +79,11 @@ def farm_mixed(main_crop=None):
 					companion_type, companion_pos = companion_info
 					companion_map[(x, y)] = (companion_type, companion_pos)
 			
-			y = y + 1
+			# 根据方向更新y值
+			y = y + direction
+		
+		# 更新方向和x值
+		direction = direction * -1
 		x = x + 1
 	
 	# 第二阶段：种植伴生植物
@@ -81,13 +97,17 @@ def farm_mixed(main_crop=None):
 		
 		position_demand[companion_pos].append((main_pos, companion_type))
 	
+	# 存储主作物坐标列表
+	main_crop_positions = []
+	for main_pos in companion_map:
+		main_crop_positions.append(main_pos)
+	
 	# 种植伴生植物（优先满足需求最多的位置）
 	for comp_pos in position_demand:
 		cx, cy = comp_pos
-		utils.move_to(cx, cy)
-		
 		# 检查位置是否在场地范围内
 		if cx >= 0 and cx < size and cy >= 0 and cy < size:
+			utils.move_to(cx, cy)
 			entity = get_entity_type()
 			
 			# 收获现有作物
@@ -128,55 +148,12 @@ def farm_mixed(main_crop=None):
 				elif best_type == Entities.Carrot:
 					if num_items(Items.Carrot) >= 1:
 						plant(Entities.Carrot)
-	
-	# 第三阶段：等待成熟并浇水
-	all_mature = False
-	while not all_mature:
-		all_mature = True
-		x = 0
-		while x < size:
-			y = 0
-			while y < size:
-				utils.move_to(x, y)
-				entity = get_entity_type()
-				
-				# 检查主作物是否成熟
-				if entity == main_crop:
-					if not can_harvest():
-						all_mature = False
-						# 高水位加速成熟
-						if get_water() < 0.8:
-							use_item(Items.Water)
-				
-				y = y + 1
-			x = x + 1
-	
-	# 第四阶段：收获主作物（获得5倍或更高产量）
-	x = 0
-	while x < size:
-		y = 0
-		while y < size:
-			utils.move_to(x, y)
-			entity = get_entity_type()
-			
-			# 只收获主作物
-			if entity == main_crop:
-				if can_harvest():
-					harvest()
-			
-			y = y + 1
-		x = x + 1
-	
-	# 第五阶段：清理伴生植物
-	x = 0
-	while x < size:
-		y = 0
-		while y < size:
-			utils.move_to(x, y)
-			
-			# 收获所有剩余作物
-			if can_harvest():
-				harvest()
-			
-			y = y + 1
-		x = x + 1
+
+	for main_pos in main_crop_positions:
+		x, y = main_pos
+		utils.move_to(x, y)
+		entity = get_entity_type()
+		
+		# 收获主作物
+		if entity == main_crop and can_harvest():
+			harvest()
