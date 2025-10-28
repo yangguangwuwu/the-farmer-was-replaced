@@ -8,10 +8,23 @@ def farm_sunflowers():
 	# 存储每个位置的花瓣数 {(x,y): petals}
 	petal_map = {}
 	
+	# 使用蛇形路径移动，提高效率
 	x = 0
+	y = 0
+	direction = 1  # 1 表示向右，-1 表示向左
+	
+	# 按照蛇形路径遍历整个农场
 	while x < size:
-		y = 0
-		while y < size:
+		# 根据方向确定y的起始和结束值
+		if direction == 1:
+			y_start = 0
+			y_end = size
+		else:
+			y_start = size - 1
+			y_end = -1
+		
+		y = y_start
+		while y != y_end:
 			utils.move_to(x, y)
 			utils.tilling()
 			
@@ -37,7 +50,11 @@ def farm_sunflowers():
 			petals = measure()
 			petal_map[(x, y)] = petals
 			
-			y = y + 1
+			# 根据方向更新y值
+			y = y + direction
+		
+		# 更新方向和x值
+		direction = direction * -1
 		x = x + 1
 	
 	# 等待成熟（只需检查第一个种植的向日葵）
@@ -51,6 +68,10 @@ def farm_sunflowers():
 	# 持续收获最大花瓣数的向日葵（每次都获得5倍能量！）
 	# 利用已存储的花瓣数，无需重复测量
 	while petal_map:
+		# 如果petal_map长度小于10，跳出循环
+		if len(petal_map) < 10:
+			petal_map = {}
+			break
 		# 找出当前最大花瓣数
 		current_max = 0
 		for pos in petal_map:
